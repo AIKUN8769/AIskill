@@ -1,0 +1,33 @@
+import cv2
+
+# Load the pre-trained model for image recognition
+model = cv2.dnn.readNetFromCaffe('model.prototxt', 'model.caffemodel')
+
+# Function to recognize objects in an image
+def recognize_objects(image_path):
+    # Load the image
+    image = cv2.imread(image_path)
+
+    # Preprocess the image for input to the model
+    blob = cv2.dnn.blobFromImage(cv2.resize(image, (300, 300)), 0.007843, (300, 300), 127.5)
+
+    # Set the input to the model
+    model.setInput(blob)
+
+    # Perform object detection
+    detections = model.forward()
+
+    # Loop over the detections and print the results
+    for i in range(detections.shape[2]):
+        confidence = detections[0, 0, i, 2]
+        if confidence > 0.5:
+            class_id = int(detections[0, 0, i, 1])
+            class_name = class_names[class_id]
+            print("Detected object: " + class_name)
+
+# List of class names
+class_names = ["background", "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat"]
+
+# Main code
+image_path = 'image.jpg'  # Replace with the path to your image
+recognize_objects(image_path)
